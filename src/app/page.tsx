@@ -1,9 +1,16 @@
-import Image from "next/image";
 
-export default function Home() {
+import React from "react";
+
+// Dummy dashboard component with content
+export default function Dashboard () {
   return (
- <>
- Hello Thi
- </>
+    
+   <>
+   <p>
+
+     Hello bro
+   </p>
+    
+    </>
   );
-}
+};
