@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from '@/firebase/config';
 import SettingsDialog from '@/components/dialogs/setting-dialog';
 import { useUser } from '@/firebase/firebase-user-provider';
+import ProfileHeader from './profileHeader';
 
 
 
@@ -35,33 +36,9 @@ const ProfileUI = () => {
     <div className="container mx-auto p-4 max-w-2xl">
       <Card className="bg-white shadow-none border-none rounded-lg overflow-hidden">
         <CardHeader className="text-center pb-0">
-          <Avatar  className="mx-auto h-24 w-24">
-            <AvatarImage src={user.photoURL}></AvatarImage>
-        
-            <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
-        
-          </Avatar>
-          <CardTitle className="mt-4 text-xl font-semibold">
-            {user?.displayName || 'tahirwaleed399'}
-          </CardTitle>
-          <SettingsDialog></SettingsDialog>
+          <ProfileHeader/>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-around my-6">
-            <div className="text-center">
-              <p className="font-bold">0</p>
-              <p className="text-sm text-gray-500">Followers</p>
-            </div>
-            <div className="text-center">
-              <p className="font-bold">0</p>
-              <p className="text-sm text-gray-500">Following</p>
-            </div>
-            <div className="text-center">
-              <p className="font-bold">0</p>
-              <p className="text-sm text-gray-500">Chats</p>
-            </div>
-          </div>
-          
           <Tabs defaultValue="characters" className="w-full">
             <TabsList defaultValue={'characters'} className="grid w-full grid-cols-4">
               <TabsTrigger value="characters">Characters</TabsTrigger>

@@ -14,6 +14,7 @@ import { checkUsernameAvailability } from '@/firebase/services/profile-service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { Settings } from "lucide-react";
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -133,7 +134,10 @@ const SettingsDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Open Settings</Button>
+            <Button variant="outline" className="rounded-full">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
