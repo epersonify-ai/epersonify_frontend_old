@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,6 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from '@/firebase/firebase-user-provider';
+import { doc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { firestore, storage } from '@/firebase/config';
+import { checkUsernameAvailability } from '@/firebase/services/profile-service';
 
 const schema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters long" }),
@@ -21,8 +27,11 @@ const schema = z.object({
 const SettingsDialog = () => {
   const [open, setOpen] = useState(false);
   const [avatar, setAvatar] = useState('/placeholder.jpg');
+  const [avatarFile, setAvatarFile] = useState(null);
+  const { user, loading } = useUser();
+  const { toast } = useToast();
   
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const { control, handleSubmit, formState: { errors }, reset, watch } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       username: '',
@@ -31,23 +40,91 @@ const SettingsDialog = () => {
     },
   });
 
-  const onSubmit = (data:any) => {
-    console.log(data);
-    setOpen(false);
+  const watchUsername = watch("username");
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        username: user.username || '',
+        displayName: user.displayName || '',
+        bio: user.bio || '',
+      });
+      setAvatar(user.photoURL || '/placeholder.jpg');
+    }
+  }, [user, reset]);
+
+  const uploadImage = async (file:any) => {
+    if (!file) return null;
+    const storageRef = ref(storage, `profiles/${user.uid}/${file.name}`);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
   };
 
-  const handleImageUpload = (e:any) => {
+  const onSubmit = async (data:any) => {
+    if (!user) return;
+
+    try {
+      let updateData :Partial<User>= {};
+      let photoURL = avatar;
+
+      // Check if username has changed
+      if (data.username !== user.username) {
+        const isUsernameAvailable = await checkUsernameAvailability(data.username);
+        if (!isUsernameAvailable) {
+          toast({
+            title: "Username not available",
+            description: "Please choose a different username.",
+            variant: "destructive",
+          });
+          return;
+        }
+        updateData.username = data.username;
+      }
+
+      // Upload new avatar if changed
+      if (avatarFile) {
+        photoURL = await uploadImage(avatarFile);
+        updateData.photoURL = photoURL;
+      }
+ 
+      // Add other fields to update data
+      updateData = {
+        ...updateData,
+        displayName: data.displayName,
+        bio: data.bio,
+      };
+
+      const userRef = doc(firestore, 'users', user.uid);
+      await updateDoc(userRef, updateData);
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+      setOpen(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while updating your profile.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
       reader.onload = (e) => setAvatar(e.target.result);
       reader.readAsDataURL(file);
-
-      const formData = new FormData();
-      formData.append('avatar', file);
-      console.log('FormData:', formData);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -62,7 +139,6 @@ const SettingsDialog = () => {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="public">Public Profile</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
-         
           </TabsList>
           <TabsContent value="public">
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -71,18 +147,23 @@ const SettingsDialog = () => {
                   <PopoverTrigger asChild>
                     <Avatar className="w-24 h-24 mx-auto cursor-pointer">
                       <AvatarImage src={avatar} />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto">
-                    <div className="grid gap-4">
-                      <Button onClick={() => console.log('Generate Image')}>Generate Image</Button>
-                      <label className="cursor-pointer">
-                        <Input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
-                        <Button >Upload Image</Button>
-                      </label>
-                    </div>
-                  </PopoverContent>
+    <div className="grid gap-4">
+      <label  htmlFor="profile"  className="cursor-pointer">
+        Upload Image
+        <input
+          id="profile"
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleImageUpload}
+        />
+      </label>
+    </div>
+  </PopoverContent>
                 </Popover>
                 
                 <Controller
@@ -128,9 +209,6 @@ const SettingsDialog = () => {
                 </p>
               </CardContent>
             </Card>
-          </TabsContent>
-          <TabsContent value="settings">
-            <p>Settings content here</p>
           </TabsContent>
         </Tabs>
       </DialogContent>

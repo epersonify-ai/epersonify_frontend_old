@@ -3,10 +3,11 @@ import PrivateRoute from '@/components/guards/private-route'
 import React from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from '@/firebase/config';
 import SettingsDialog from '@/components/dialogs/setting-dialog';
+import { useUser } from '@/firebase/firebase-user-provider';
 
 
 
@@ -22,24 +23,23 @@ export default Profile
 
 
 const ProfileUI = () => {
-  const [user, loading, error] = useAuthState(auth);
+  const {user, loading} = useUser();
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+  if(!user) return <></>
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <Card className="bg-white shadow-none border-none rounded-lg overflow-hidden">
         <CardHeader className="text-center pb-0">
-          <Avatar className="mx-auto h-24 w-24">
-            <AvatarFallback className="bg-orange-500 text-white text-4xl">
-              T
-            </AvatarFallback>
+          <Avatar  className="mx-auto h-24 w-24">
+            <AvatarImage src={user.photoURL}></AvatarImage>
+        
+            <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
+        
           </Avatar>
           <CardTitle className="mt-4 text-xl font-semibold">
             {user?.displayName || 'tahirwaleed399'}
@@ -62,8 +62,8 @@ const ProfileUI = () => {
             </div>
           </div>
           
-          <Tabs defaultValue="settings" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+          <Tabs defaultValue="characters" className="w-full">
+            <TabsList defaultValue={'characters'} className="grid w-full grid-cols-4">
               <TabsTrigger value="characters">Characters</TabsTrigger>
               <TabsTrigger value="personas">Personas</TabsTrigger>
               <TabsTrigger value="liked">Liked</TabsTrigger>

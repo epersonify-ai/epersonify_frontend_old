@@ -17,6 +17,8 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import ChatSidebar from "@/components/sidebar/chat-sidebar";
 import Navbar from "@/components/navbar/navbar";
 import AuthModal from "@/components/auth/AuthModal";
+import { UserProvider } from "@/firebase/firebase-user-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -48,6 +50,8 @@ export default function Layout({
   return (
     <html lang="en">
     <body className={inter.className}>
+    <UserProvider>
+
     <div
       className={cn(
         "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1  mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden",
@@ -55,6 +59,8 @@ export default function Layout({
       )}
     >
       <AuthModal />
+      <Toaster />
+
       <ChatSidebar links={links}/>
       <div className="flex flex-1 flex-col">
     <Navbar></Navbar>
@@ -65,6 +71,8 @@ export default function Layout({
       </div>
     </div>
     </div>
+    </UserProvider>
+
     </body>
   </html>
  
