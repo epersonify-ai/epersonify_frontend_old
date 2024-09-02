@@ -2,23 +2,23 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-import React from "react";
+import AuthModal from "@/components/auth/AuthModal";
+import Navbar from "@/components/navbar/navbar";
+import ChatSidebar from "@/components/sidebar/chat-sidebar";
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/toaster";
+import { UserProvider } from "@/firebase/firebase-user-provider";
+import { cn } from "@/lib/utils";
 import {
   IconArrowLeft,
   IconBrandTabler,
   IconSettings,
   IconUserBolt,
 } from "@tabler/icons-react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import ChatSidebar from "@/components/sidebar/chat-sidebar";
-import Navbar from "@/components/navbar/navbar";
-import AuthModal from "@/components/auth/AuthModal";
-import { UserProvider } from "@/firebase/firebase-user-provider";
-import { Toaster } from "@/components/ui/toaster";
+import Link from "next/link";
+import React from "react";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -64,8 +64,7 @@ export default function Layout({
       <ChatSidebar links={links}/>
       <div className="flex flex-1 flex-col">
     <Navbar></Navbar>
-      <div className="p-2 md:p-10 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
-      
+      <div className="p-2 md:px-8 lg:px-16 xl:px-24 rounded-tl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
        
       {children}
       </div>
