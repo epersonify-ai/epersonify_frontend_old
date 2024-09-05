@@ -149,6 +149,27 @@ export default function CharacterCreationForm() {
         <div>
           <Label>Visibility</Label>
           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex justify-between">
+                {visibilityIcons[visibility as keyof typeof visibilityIcons]}
+                <span>&nbsp; {visibility}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-full">
+              <DropdownMenuItem onClick={() => setVisibility('Public')}>
+                <Globe className="h-4 w-4 mr-2" />
+                <span>Public</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setVisibility('Unlisted')}>
+                <LinkIcon className="h-4 w-4 mr-2" />
+                <span>Unlisted</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setVisibility('Private')}>
+                <Lock className="h-4 w-4 mr-2" />
+                <span>Private</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
