@@ -40,17 +40,7 @@ export const cardsData = {
       status: 'public',
     },
   ],
-  personas: [
-    {
-      image: '/placeholder.png',
-      title: 'Detective Noir',
-      description: 'Solve mysteries in a gritty urban setting',
-      chats: '8.7m',
-      likes: '3,210',
-      by: '@mysterywriter',
-      status: 'public',
-    },
-  ],
+  personas: [],
   voices: [
     {
       image: '/placeholder.png',
