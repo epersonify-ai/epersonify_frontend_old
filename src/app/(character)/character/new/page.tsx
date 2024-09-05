@@ -130,6 +130,19 @@ export default function CharacterCreationForm() {
 
         {showMoreOptions && (
           <div>
+            <Label htmlFor="definition">Definition</Label>
+            <Textarea
+              id="definition"
+              name="definition"
+              placeholder="Definition"
+              maxLength={2048}
+              onChange={handleInputChange}
+            />
+            <div className="text-right text-sm text-gray-500">{characterCount.definition}/2048</div>
+            <div className="flex items-center space-x-2 mt-2">
+              <Checkbox id="private-definition" />
+              <Label htmlFor="private-definition">Keep definition private</Label>
+            </div>
           </div>
         )}
 
