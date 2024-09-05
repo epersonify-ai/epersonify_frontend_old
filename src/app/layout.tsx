@@ -14,6 +14,7 @@ import {
   IconBrandTabler,
   IconSettings,
   IconUserBolt,
+  IconUserPlus
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -41,6 +42,14 @@ export default function Layout({
       href: "/profile",
       icon: (
         <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+
+    {
+      label: "Create Character",
+      href: "/character/new",
+      icon: (
+        <IconUserPlus className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     
