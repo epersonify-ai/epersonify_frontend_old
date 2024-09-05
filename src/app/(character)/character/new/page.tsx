@@ -19,6 +19,7 @@ export default function CharacterCreationForm() {
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [visibility, setVisibility] = useState('Public')
   const [voice, setVoice] = useState('Add')
+  const [isVoiceOpen, setIsVoiceOpen] = useState(false);
   const [characterCount, setCharacterCount] = useState({
     name: 0,
     tagline: 0,
@@ -31,6 +32,11 @@ export default function CharacterCreationForm() {
     const { name, value } = e.target
     setCharacterCount(prev => ({ ...prev, [name]: value.length }))
   }
+
+  const handleVoiceChange = (newVoice: string) => {
+    setVoice(newVoice);
+    setIsVoiceOpen(false);
+  };
 
   const visibilityIcons = {
     Public: <Globe className="h-4 w-4" />,
@@ -104,9 +110,9 @@ export default function CharacterCreationForm() {
           <div className="text-right text-sm text-gray-500">{characterCount.greeting}/2048</div>
         </div>
 
-        <Dialog>
+        <Dialog open={isVoiceOpen} onOpenChange={setIsVoiceOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="w-full justify-between">
+            <Button variant="outline" className="w-full justify-between" onClick={() => setIsVoiceOpen(true)}>
               <span>Voice: {voice}</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -123,7 +129,7 @@ export default function CharacterCreationForm() {
                     key={v}
                     variant="outline"
                     className="w-full justify-start"
-                    onClick={() => setVoice(v)}
+                    onClick={() => handleVoiceChange(v)}
                   >
                     <div className={v !== 'None' ? "w-8 h-8 bg-slate-200 rounded mr-2" : ""}></div>
                     {v}
