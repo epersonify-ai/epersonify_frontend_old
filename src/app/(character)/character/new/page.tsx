@@ -115,6 +115,22 @@ export default function CharacterCreationForm() {
             <DialogHeader>
               <DialogTitle>Voices</DialogTitle>
             </DialogHeader>
+            <div className="space-y-4">
+              <Input placeholder="Search" />
+              <div className="space-y-2">
+                {['None', 'Voice1', 'Voice2', 'Voice3'].map((v) => (
+                  <Button
+                    key={v}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => setVoice(v)}
+                  >
+                    <div className={v !== 'None' ? "w-8 h-8 bg-slate-200 rounded mr-2" : ""}></div>
+                    {v}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
 
