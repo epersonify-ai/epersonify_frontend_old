@@ -2,23 +2,24 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-import React from "react";
+import AuthModal from "@/components/auth/AuthModal";
+import Navbar from "@/components/navbar/navbar";
+import ChatSidebar from "@/components/sidebar/chat-sidebar";
+import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/toaster";
+import { UserProvider } from "@/firebase/firebase-user-provider";
+import { cn } from "@/lib/utils";
 import {
   IconArrowLeft,
   IconBrandTabler,
   IconSettings,
   IconUserBolt,
+  IconUserPlus
 } from "@tabler/icons-react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import ChatSidebar from "@/components/sidebar/chat-sidebar";
-import Navbar from "@/components/navbar/navbar";
-import AuthModal from "@/components/auth/AuthModal";
-import { UserProvider } from "@/firebase/firebase-user-provider";
-import { Toaster } from "@/components/ui/toaster";
+import Link from "next/link";
+import React from "react";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -43,6 +44,14 @@ export default function Layout({
         <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
+
+    {
+      label: "Create Character",
+      href: "/character/new",
+      icon: (
+        <IconUserPlus className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
     
     
   ];
@@ -55,7 +64,7 @@ export default function Layout({
     <div
       className={cn(
         "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1  mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden",
-        "h-screen" // for your use case, use `h-screen` instead of `h-[60vh]`
+        "min-h-screen" // for your use case, use `h-screen` instead of `h-[60vh]`
       )}
     >
       <AuthModal />

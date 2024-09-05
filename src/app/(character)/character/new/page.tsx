@@ -11,7 +11,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ChevronDown, ChevronLeft, Globe, Link, Lock, Pencil } from 'lucide-react'
+import { ChevronDown, ChevronLeft, Globe, Link as LinkIcon, Lock, Pencil } from 'lucide-react'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 export default function CharacterCreationForm() {
@@ -33,16 +34,18 @@ export default function CharacterCreationForm() {
 
   const visibilityIcons = {
     Public: <Globe className="h-4 w-4" />,
-    Unlisted: <Link className="h-4 w-4" />,
+    Unlisted: <LinkIcon className="h-4 w-4" />,
     Private: <Lock className="h-4 w-4" />,
   }
 
   return (
     <>
     <div className="flex items-left mb-6">
-      <Button variant="ghost" className="p-0">
-        <ChevronLeft className="h-6 w-6" />
-      </Button>
+      <Link href="/profile" passHref>
+        <Button variant="ghost" className="p-0">
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      </Link>
     </div>
     <div className="container mx-auto p-4 max-w-2xl">
 
