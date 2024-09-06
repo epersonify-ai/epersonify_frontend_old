@@ -15,12 +15,15 @@ enum CardStatus {
 */
 
 export interface CardType {
+  id: string;
   image: string;
   title: string;
   description: string;
   chats: string;
   likes: string;
   by: string;
+  status: string;
+  userId: string;
 }
 
 export interface CardsType {

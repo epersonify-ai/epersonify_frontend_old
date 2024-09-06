@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Ellipsis, LockKeyhole, MessageCircle, ThumbsUp } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Ellipsis, LockKeyhole, MessageCircle, Pencil, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { CardType } from '../types';
 
 type CardItemType = {
@@ -11,7 +13,7 @@ type CardItemType = {
 export default function CardItem({ card }: CardItemType) {
   return (
     <Card className="flex items-start space-x-4 bg-transparent border-transparent shadow-transparent">
-      <Image src={card.image} alt={card.title} width={80} height={80} className="rounded-md" />
+      <Image src={card.image || '/placeholder.svg?height=80&width=80'} alt={card.title} width={80} height={80} className="rounded-md" />
       <div className="flex-1">
         <CardHeader className="p-0">
           <CardTitle className="text-base font-semibold">{card.title}</CardTitle>
@@ -29,15 +31,24 @@ export default function CardItem({ card }: CardItemType) {
       </div>
       <div className="flex flex-col">
         <Button variant="ghost" size="icon" className="shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-            <LockKeyhole cx="12" cy="12" r="1" />
-          </svg>
+          <LockKeyhole className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-            <Ellipsis cx="12" cy="12" r="1" />
-          </svg>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="shrink-0">
+              <Ellipsis className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link href={`/character/${card.id}/edit`} className="flex items-center">
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit
+              </Link>
+            </DropdownMenuItem>
+            {/* Add more dropdown items here if needed */}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </Card>
   );

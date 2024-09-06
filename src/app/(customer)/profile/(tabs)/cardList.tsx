@@ -1,19 +1,62 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { cardsData } from '../data';
+import { collection, query, where, getDocs, DocumentData } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, firestore } from '@/firebase/config';
 import { CardType } from '../types';
 import CardItem from './cardItem';
 import SortComponent from './sortComponent';
 
 type CardListProps = {
-  activeTab: keyof typeof cardsData;
+  activeTab: 'characters' | 'liked' | 'personas' | 'voices';
 };
 
 export default function CardList({ activeTab }: CardListProps) {
-  const [sortedCards, setSortedCards] = useState<CardType[]>(cardsData[activeTab]);
+  const [sortedCards, setSortedCards] = useState<CardType[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setSortedCards(cardsData[activeTab]);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchCards(user.uid);
+      } else {
+        setSortedCards([]);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
   }, [activeTab]);
+
+  const fetchCards = async (userId: string) => {
+    setLoading(true);
+    try {
+      let q;
+      if (activeTab === 'characters') {
+        q = query(collection(firestore, 'personalities'), where('userId', '==', userId));
+      } else if (activeTab === 'liked') {
+        q = query(collection(firestore, 'likes'), where('userId', '==', userId));
+      } else {
+        // For 'personas' and 'voices', you might need to implement similar queries
+        q = query(collection(firestore, activeTab), where('userId', '==', userId));
+      }
+
+      const querySnapshot = await getDocs(q);
+      const cards: CardType[] = querySnapshot.docs.map(doc => {
+        const data = doc.data() as Omit<CardType, 'id'>;
+        return {
+          id: doc.id,
+          ...data
+        };
+      });
+      setSortedCards(cards);
+    } catch (error) {
+      console.error('Error fetching cards:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const emptyMessages = {
     characters: "You haven't created any characters yet.",
@@ -25,14 +68,16 @@ export default function CardList({ activeTab }: CardListProps) {
   return (
     <div className="space-y-4">
       {['characters', 'liked'].includes(activeTab) && (
-        <SortComponent cards={cardsData[activeTab]} onSortedCardsChange={setSortedCards} />
+        <SortComponent cards={sortedCards} onSortedCardsChange={setSortedCards} />
       )}
-      {sortedCards.length > 0 ? (
-        sortedCards.map((card: CardType, index: number) => (
-          <CardItem key={index} card={card} />
+      {loading ? (
+        <div className="text-center py-8">Loading...</div>
+      ) : sortedCards.length > 0 ? (
+        sortedCards.map((card: CardType) => (
+          <CardItem key={card.id} card={card} />
         ))
       ) : (
-        <div  className="text-center py-8 text-gray-500">{emptyMessages[activeTab]}</div>
+        <div className="text-center py-8 text-gray-500">{emptyMessages[activeTab]}</div>
       )}
     </div>
   );
