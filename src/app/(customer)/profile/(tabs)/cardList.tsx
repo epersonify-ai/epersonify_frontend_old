@@ -3,7 +3,7 @@
 import { auth, firestore } from '@/firebase/config';
 import { onAuthStateChanged } from 'firebase/auth';
 import { DocumentData, Query, QueryConstraint, collection, getDocs, query, where } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CardItem from './cardItem';
 import SortComponent from './sortComponent';
 
@@ -27,11 +27,16 @@ type CardListProps = {
 export default function CardList({ activeTab }: CardListProps) {
   const [sortedCards, setSortedCards] = useState<CardType[]>([]);
   const [loading, setLoading] = useState(true);
+  const prevUserIdRef = useRef<string | null>(null); // Store previous user ID
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        fetchCards(user.uid); // Fetch cards for the logged-in user
+        // Fetch cards only if user ID has changed
+        if (prevUserIdRef.current !== user.uid) {
+          prevUserIdRef.current = user.uid; // Update with new user ID
+          fetchCards(user.uid); // Fetch cards for the logged-in user
+        }
       } else {
         setSortedCards([]); // Clear cards if the user is logged out
         setLoading(false);
@@ -50,7 +55,7 @@ export default function CardList({ activeTab }: CardListProps) {
       if (activeTab === 'characters') {
         q = query(collection(firestore, 'personalities'), where('userId', '==', userId));
       } else if (activeTab === 'liked') {
-        q = query(collection(firestore, 'likes'), where('userId', '==', userId));  // Needs better logic
+        q = query(collection(firestore, 'likes'), where('userId', '==', userId)); // Needs better logic
       } else if (activeTab === 'personas') {
         q = query(collection(firestore, 'personas'), where('userId', '==', userId));
       } else if (activeTab === 'voices') {
@@ -74,7 +79,14 @@ export default function CardList({ activeTab }: CardListProps) {
             userId: data.userId || userId,
           };
         });
-        setSortedCards(cards); // Update the state with fetched cards
+        const areCardsEqual = (newCards: CardType[], currentCards: CardType[]) => {
+          if (newCards.length !== currentCards.length) return false;
+          return newCards.every((newCard, index) => newCard.id === currentCards[index].id);
+        };
+
+        if (!areCardsEqual(cards, sortedCards)) {
+          setSortedCards(cards); // Update the state with fetched cards
+        }
       }
     } catch (error) {
       console.error('Error fetching cards:', error);

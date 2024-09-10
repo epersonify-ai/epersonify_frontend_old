@@ -1,10 +1,5 @@
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ArrowDownAZ, ArrowDownNarrowWide, ArrowUpAZ, ArrowUpNarrowWide, MessageCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { CardType } from '../types';
@@ -30,9 +25,7 @@ export default function SortComponent({ cards, onSortedCardsChange }: SortProps)
       if (typeof keyA === 'number' && typeof keyB === 'number') {
         return direction === 'ASC' ? keyA - keyB : keyB - keyA;
       } else {
-        return direction === 'ASC'
-          ? String(keyA).localeCompare(String(keyB))
-          : String(keyB).localeCompare(String(keyA));
+        return direction === 'ASC' ? String(keyA).localeCompare(String(keyB)) : String(keyB).localeCompare(String(keyA));
       }
     });
   };
