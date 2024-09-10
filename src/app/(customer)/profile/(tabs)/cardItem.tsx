@@ -4,13 +4,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Ellipsis, LockKeyhole, MessageCircle, Pencil, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import React from 'react';
 import { CardType } from '../types';
 
 type CardItemType = {
   card: CardType;
 };
 
-export default function CardItem({ card }: CardItemType) {
+const CardItem = React.memo(function CardItem({ card }: { card: CardType }) {
   return (
     <Card className="flex items-start space-x-4 bg-transparent border-transparent shadow-transparent">
       <Image src={card.image || '/placeholder.svg?height=80&width=80'} alt={card.title} width={80} height={80} className="rounded-md" />
@@ -52,4 +53,6 @@ export default function CardItem({ card }: CardItemType) {
       </div>
     </Card>
   );
-}
+});
+
+export default CardItem;
