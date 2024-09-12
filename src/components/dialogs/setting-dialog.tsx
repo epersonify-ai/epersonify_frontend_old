@@ -1,22 +1,23 @@
 "use client"
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { useUser } from '@/firebase/firebase-user-provider';
-import { doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { firestore, storage } from '@/firebase/config';
+import { useUser } from '@/firebase/firebase-user-provider';
 import { checkUsernameAvailability } from '@/firebase/services/profile-service';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { doc, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { Settings } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 const schema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters long" }),
@@ -40,6 +41,7 @@ const SettingsDialog = () => {
     },
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const watchUsername = watch("username");
 
   useEffect(() => {
@@ -62,6 +64,7 @@ const SettingsDialog = () => {
 
   const onSubmit = async (data:any) => {
     if (!user) return;
+    setIsSubmitting(true);
 
     try {
       let updateData :Partial<User>= {};
@@ -76,6 +79,7 @@ const SettingsDialog = () => {
             description: "Please choose a different username.",
             variant: "destructive",
           });
+          setIsSubmitting(false);
           return;
         }
         updateData.username = data.username;
@@ -110,6 +114,7 @@ const SettingsDialog = () => {
         variant: "destructive",
       });
     }
+    setIsSubmitting(false);
   };
 
   const handleImageUpload = (e) => {
@@ -129,7 +134,10 @@ const SettingsDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Open Settings</Button>
+            <Button variant="outline" className="rounded-full">
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -194,8 +202,8 @@ const SettingsDialog = () => {
                 {errors.bio && <p className="text-red-500">{errors.bio.message}</p>}
                 
                 <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                  <Button type="submit">Save</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : 'Save'}</Button>
                 </div>
               </div>
             </form>
